@@ -4,6 +4,7 @@ const cookieParser = require('cookie-parser');
 const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
 const { createServer } = require('http');
+const path = require('path');
 const { Server } = require('socket.io');
 require('dotenv').config();
 
@@ -40,9 +41,10 @@ app.use(cors({
   origin: (origin, callback) => {
     const allowed = [
       process.env.CLIENT_URL || 'http://localhost:5173',
+      process.env.RENDER_EXTERNAL_URL,
       'http://localhost:5173',
       'http://localhost:3000'
-    ];
+    ].filter(Boolean);
     if (!origin) return callback(null, true);
     if (allowed.includes(origin)) return callback(null, true);
     return callback(new Error('Not allowed by CORS'));
@@ -71,9 +73,10 @@ const io = new Server(server, {
   cors: {
     origin: [
       process.env.CLIENT_URL || 'http://localhost:5173',
+      process.env.RENDER_EXTERNAL_URL,
       'http://localhost:5173',
       'http://localhost:3000'
-    ],
+    ].filter(Boolean),
     credentials: true
   }
 });
@@ -198,16 +201,25 @@ io.on('connection', (socket) => {
 // Error handling middleware
 app.use((err, req, res, next) => {
   console.error(err.stack);
-  res.status(500).json({ 
+  res.status(500).json({
     message: 'Something went wrong!',
     error: process.env.NODE_ENV === 'development' ? err.message : {}
   });
 });
 
-// 404 handler
-app.use('*', (req, res) => {
-  res.status(404).json({ message: 'Route not found' });
-});
+// Serve static files from the React app
+if (process.env.NODE_ENV === 'production') {
+  app.use(express.static(path.join(__dirname, '../frontend/dist')));
+
+  app.get('*', (req, res) => {
+    res.sendFile(path.join(__dirname, '../frontend/dist/index.html'));
+  });
+} else {
+  // 404 handler for development or if not in production mode
+  app.use('*', (req, res) => {
+    res.status(404).json({ message: 'Route not found' });
+  });
+}
 
 const PORT = process.env.PORT || 5000;
 

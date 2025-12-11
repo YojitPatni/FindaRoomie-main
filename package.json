@@ -1,0 +1,21 @@
+{
+  "name": "findaroomie-root",
+  "version": "1.0.0",
+  "description": "Root package for FindaRoomie deployment",
+  "scripts": {
+    "install-backend": "cd backend && npm install",
+    "install-frontend": "cd frontend && npm install",
+    "build-frontend": "cd frontend && npm run build",
+    "build": "npm run install-backend && npm run install-frontend && npm run build-frontend",
+    "start": "cd backend && npm start"
+  },
+  "engines": {
+    "node": ">=16.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/username/findaroomie.git"
+  },
+  "author": "",
+  "license": "ISC"
+}

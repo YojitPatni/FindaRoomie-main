@@ -14,7 +14,8 @@ export function getAuthToken() {
 
 export function getSocket() {
   if (socket && socket.connected) return socket;
-  const url = import.meta.env.VITE_WS_URL || 'http://localhost:5001';
+  // In production, undefined URL means "connect to window.location"
+  const url = import.meta.env.VITE_WS_URL || (import.meta.env.DEV ? 'http://localhost:5001' : undefined);
   socket = io(url, {
     withCredentials: true,
     transports: ['websocket'],
