@@ -1,0 +1,79 @@
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+Icon
+
+# Node
+node_modules/
+**/node_modules/
+
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Env files
+.env
+.env.*
+backend/.env
+frontend/.env
+
+# Build output
+/dist
+/dist-ssr
+/build
+/.cache
+/.parcel-cache
+**/coverage/
+
+# Vite
+vite.svg
+
+# Next/React/Vite caches
+.next/
+.cache/
+.eslintcache
+
+# Editor directories and files
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# Optional npm cache directory
+.npm
+
+# Optional eslint cache
+.eslintcache
+
+# Optional REPL history
+.node_repl_history
+
+# Output of 'npm pack'
+*.tgz
+
+# Yarn Integrity file
+yarn.lock
+pnpm-lock.yaml
+package-lock.json
+
+# TypeScript
+*.tsbuildinfo
+
+# Images and uploads temp (if any)
+/tmp
+/temp
+uploads/
+
+# Coverage directory used by tools like istanbul
+coverage
+
+# Local environment overrides
+*.local
