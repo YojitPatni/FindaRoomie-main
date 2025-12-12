@@ -20,8 +20,8 @@ export default function LoginPage() {
       <div className="card w-full max-w-md bg-base-100 shadow-xl border border-base-200">
         <div className="card-body">
           <div className="text-center mb-8">
-            <h2 className="text-3xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">Welcome Back</h2>
-            <p className="text-base-content/60 mt-2">Sign in to continue your journey</p>
+            <h2 className="text-2xl md:text-3xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">Welcome Back</h2>
+            <p className="text-sm md:text-base text-base-content/60 mt-2">Sign in to continue your journey</p>
           </div>
 
           {error && (

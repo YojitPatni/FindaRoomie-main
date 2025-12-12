@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { Routes, Route, Link, useNavigate, useLocation } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -19,6 +19,25 @@ import ReceivedRequestsPage from './pages/requests/ReceivedRequestsPage.jsx';
 import ProtectedRoute from './components/ProtectedRoute.jsx';
 import ThemeToggle from './components/ThemeToggle.jsx';
 import PageTransition from './components/PageTransition.jsx';
+
+function Avatar({ user }) {
+  const [imgError, setImgError] = useState(false);
+
+  if (user?.avatar && user.avatar.startsWith('http') && !imgError) {
+    return (
+      <img
+        src={user.avatar}
+        alt={user.name}
+        onError={() => setImgError(true)}
+        className="w-full h-full object-cover"
+      />
+    );
+  }
+
+  return (
+    <span className="text-xl font-bold">{user?.name?.[0]?.toUpperCase() || 'U'}</span>
+  );
+}
 
 function Navbar() {
   const { user, logout, fetchMe, pendingRequestsCount } = useAuthStore();
@@ -98,12 +117,8 @@ function Navbar() {
         {user ? (
           <div className="dropdown dropdown-end">
             <div tabIndex={0} role="button" className="btn btn-ghost btn-circle avatar ring ring-primary ring-offset-base-100 ring-offset-2">
-              <div className="w-10 rounded-full bg-neutral text-neutral-content flex items-center justify-center">
-                {user.avatar && user.avatar.startsWith('http') ? (
-                  <img src={user.avatar} alt="avatar" />
-                ) : (
-                  <span className="text-xl font-bold">{user.name?.[0] || 'U'}</span>
-                )}
+              <div className="w-10 rounded-full bg-neutral text-neutral-content flex items-center justify-center overflow-hidden">
+                <Avatar user={user} />
               </div>
             </div>
             <ul tabIndex={0} className="menu menu-sm dropdown-content mt-3 z-[1] p-2 shadow-xl bg-base-100 rounded-box w-52 border border-base-200">

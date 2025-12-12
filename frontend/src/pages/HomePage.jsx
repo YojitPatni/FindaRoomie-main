@@ -27,9 +27,9 @@ export default function HomePage() {
       {/* Hero Section */}
       <section className="hero min-h-screen bg-gradient-to-br from-primary/10 via-base-100 to-secondary/10 relative overflow-hidden">
         <div className="absolute inset-0 opacity-40"></div>
-        
-        <motion.div 
-          className="hero-content text-center z-10"
+
+        <motion.div
+          className="hero-content text-center z-10 px-4"
           initial={{ opacity: 0, scale: 0.8 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 0.8, ease: 'easeOut' }}
@@ -42,40 +42,40 @@ export default function HomePage() {
               className="mb-6"
             >
               <div className="flex justify-center mb-4">
-                <motion.div 
-                  className="p-4 bg-primary/10 rounded-full"
+                <motion.div
+                  className="p-3 md:p-4 bg-primary/10 rounded-full"
                   animate={{ rotate: 360 }}
                   transition={{ duration: 20, repeat: Infinity, ease: 'linear' }}
                 >
-                  <Home className="w-12 h-12 text-primary" />
+                  <Home className="w-8 h-8 md:w-12 md:h-12 text-primary" />
                 </motion.div>
               </div>
-              <h1 className="text-6xl md:text-7xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
+              <h1 className="text-4xl md:text-7xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent leading-tight pb-2">
                 FindaRoomie
               </h1>
             </motion.div>
-            
-            <motion.p 
-              className="text-xl md:text-2xl mb-8 text-base-content/80 max-w-2xl mx-auto leading-relaxed"
+
+            <motion.p
+              className="text-lg md:text-2xl mb-8 text-base-content/80 max-w-2xl mx-auto leading-relaxed"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.4, duration: 0.6 }}
             >
-              Find your perfect roommate and room with ease. Connect with like-minded people and discover amazing living spaces in your city.
+              Find your perfect roommate and room with ease. Connect with like-minded people and discover amazing living spaces.
             </motion.p>
-            
-            <motion.div 
-              className="flex flex-col sm:flex-row gap-4 justify-center items-center"
+
+            <motion.div
+              className="flex flex-col sm:flex-row gap-4 justify-center items-center w-full"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.6, duration: 0.6 }}
             >
-              <Link to="/rooms" className="btn btn-primary btn-lg text-white group">
+              <Link to="/rooms" className="btn btn-primary btn-md md:btn-lg text-white group w-full sm:w-auto">
                 <Search className="w-5 h-5 mr-2" />
                 Find Rooms
                 <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
               </Link>
-              <Link to="/register" className="btn btn-outline btn-lg group">
+              <Link to="/register" className="btn btn-outline btn-md md:btn-lg group w-full sm:w-auto bg-base-100/50 backdrop-blur-sm">
                 <Users className="w-5 h-5 mr-2" />
                 Join Community
                 <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
@@ -83,39 +83,39 @@ export default function HomePage() {
             </motion.div>
           </div>
         </motion.div>
-        
-        {/* Floating Elements */}
-        <motion.div 
-          className="absolute top-20 left-10 opacity-20"
+
+        {/* Floating Elements with adjusted size & position for mobile */}
+        <motion.div
+          className="absolute top-10 left-4 md:top-20 md:left-10 opacity-20"
           animate={{ y: [-10, 10, -10] }}
           transition={{ duration: 4, repeat: Infinity, ease: 'easeInOut' }}
         >
-          <MapPin className="w-8 h-8 text-primary" />
+          <MapPin className="w-6 h-6 md:w-8 md:h-8 text-primary" />
         </motion.div>
-        <motion.div 
-          className="absolute bottom-20 right-10 opacity-20"
+        <motion.div
+          className="absolute bottom-10 right-4 md:bottom-20 md:right-10 opacity-20"
           animate={{ y: [10, -10, 10] }}
           transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}
         >
-          <Heart className="w-6 h-6 text-secondary" />
+          <Heart className="w-5 h-5 md:w-6 md:h-6 text-secondary" />
         </motion.div>
       </section>
 
       {/* Features Section */}
-      <section className="py-20 bg-base-100">
+      <section className="py-12 md:py-20 bg-base-100">
         <div className="container mx-auto px-4">
-          <motion.div 
-            className="text-center mb-16"
+          <motion.div
+            className="text-center mb-10 md:mb-16"
             {...fadeInUp}
           >
-            <h2 className="text-4xl md:text-5xl font-bold mb-4">Why Choose FindaRoomie?</h2>
-            <p className="text-xl text-base-content/70 max-w-2xl mx-auto">
+            <h2 className="text-3xl md:text-5xl font-bold mb-4">Why Choose FindaRoomie?</h2>
+            <p className="text-lg md:text-xl text-base-content/70 max-w-2xl mx-auto">
               We make finding roommates and rooms simple, safe, and social
             </p>
           </motion.div>
-          
-          <motion.div 
-            className="grid md:grid-cols-3 gap-8"
+
+          <motion.div
+            className="grid md:grid-cols-3 gap-6 md:gap-8"
             variants={staggerContainer}
             initial="initial"
             whileInView="animate"
@@ -149,16 +149,16 @@ export default function HomePage() {
                   variants={fadeInUp}
                   {...scaleOnHover}
                 >
-                  <div className="card-body text-center">
-                    <motion.div 
+                  <div className="card-body text-center p-6">
+                    <motion.div
                       className={`mx-auto mb-4 p-4 rounded-full bg-base-100 w-fit ${feature.color}`}
                       whileHover={{ rotate: 360 }}
                       transition={{ duration: 0.6 }}
                     >
                       <IconComponent className="w-8 h-8" />
                     </motion.div>
-                    <h3 className="card-title justify-center text-2xl mb-2">{feature.title}</h3>
-                    <p className="text-base-content/70">{feature.description}</p>
+                    <h3 className="card-title justify-center text-xl md:text-2xl mb-2">{feature.title}</h3>
+                    <p className="text-base-content/70 text-sm md:text-base">{feature.description}</p>
                   </div>
                 </motion.div>
               );
@@ -168,10 +168,10 @@ export default function HomePage() {
       </section>
 
       {/* Stats Section */}
-      <section className="py-16 bg-primary text-primary-content">
+      <section className="py-12 md:py-16 bg-primary text-primary-content">
         <div className="container mx-auto px-4">
-          <motion.div 
-            className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center"
+          <motion.div
+            className="grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-8 text-center"
             variants={staggerContainer}
             initial="initial"
             whileInView="animate"
@@ -188,8 +188,8 @@ export default function HomePage() {
                 variants={fadeInUp}
                 className="space-y-2"
               >
-                <motion.div 
-                  className="text-4xl md:text-5xl font-bold"
+                <motion.div
+                  className="text-3xl md:text-5xl font-bold"
                   initial={{ scale: 0 }}
                   whileInView={{ scale: 1 }}
                   transition={{ delay: index * 0.1, type: 'spring', stiffness: 100 }}
@@ -197,7 +197,7 @@ export default function HomePage() {
                 >
                   {stat.number}
                 </motion.div>
-                <div className="text-primary-content/80">{stat.label}</div>
+                <div className="text-primary-content/80 text-sm md:text-base">{stat.label}</div>
               </motion.div>
             ))}
           </motion.div>
@@ -205,18 +205,18 @@ export default function HomePage() {
       </section>
 
       {/* Testimonials */}
-      <section className="py-20 bg-base-200">
+      <section className="py-12 md:py-20 bg-base-200">
         <div className="container mx-auto px-4">
-          <motion.div 
-            className="text-center mb-16"
+          <motion.div
+            className="text-center mb-10 md:mb-16"
             {...fadeInUp}
           >
-            <h2 className="text-4xl md:text-5xl font-bold mb-4">What Our Users Say</h2>
-            <p className="text-xl text-base-content/70">Real stories from real people</p>
+            <h2 className="text-3xl md:text-5xl font-bold mb-4">What Our Users Say</h2>
+            <p className="text-lg md:text-xl text-base-content/70">Real stories from real people</p>
           </motion.div>
-          
-          <motion.div 
-            className="grid md:grid-cols-3 gap-8"
+
+          <motion.div
+            className="grid md:grid-cols-3 gap-6 md:gap-8"
             variants={staggerContainer}
             initial="initial"
             whileInView="animate"
@@ -249,22 +249,22 @@ export default function HomePage() {
                 whileHover={{ y: -5 }}
                 transition={{ duration: 0.2 }}
               >
-                <div className="card-body">
+                <div className="card-body p-6">
                   <div className="flex mb-4">
                     {[...Array(testimonial.rating)].map((_, i) => (
-                      <Star key={i} className="w-5 h-5 text-yellow-400 fill-current" />
+                      <Star key={i} className="w-4 h-4 md:w-5 md:h-5 text-yellow-400 fill-current" />
                     ))}
                   </div>
-                  <p className="text-base-content/80 mb-4">"{testimonial.content}"</p>
+                  <p className="text-base-content/80 mb-4 text-sm md:text-base">"{testimonial.content}"</p>
                   <div className="flex items-center">
                     <div className="avatar placeholder mr-4">
-                      <div className="bg-primary text-primary-content rounded-full w-12">
-                        <span className="text-xl">{testimonial.name[0]}</span>
+                      <div className="bg-primary text-primary-content rounded-full w-10 h-10 md:w-12 md:h-12 flex items-center justify-center">
+                        <span className="text-lg md:text-xl">{testimonial.name[0]}</span>
                       </div>
                     </div>
                     <div>
-                      <div className="font-semibold">{testimonial.name}</div>
-                      <div className="text-sm text-base-content/60">{testimonial.role}</div>
+                      <div className="font-semibold text-sm md:text-base">{testimonial.name}</div>
+                      <div className="text-xs md:text-sm text-base-content/60">{testimonial.role}</div>
                     </div>
                   </div>
                 </div>
@@ -275,7 +275,7 @@ export default function HomePage() {
       </section>
 
       {/* CTA Section */}
-      <section className="py-20 bg-gradient-to-r from-primary to-secondary text-primary-content">
+      <section className="py-12 md:py-20 bg-gradient-to-r from-primary to-secondary text-primary-content">
         <div className="container mx-auto px-4 text-center">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
@@ -283,21 +283,21 @@ export default function HomePage() {
             transition={{ duration: 0.6 }}
             viewport={{ once: true }}
           >
-            <h2 className="text-4xl md:text-5xl font-bold mb-6">Ready to Find Your Perfect Match?</h2>
-            <p className="text-xl mb-8 opacity-90 max-w-2xl mx-auto">
+            <h2 className="text-3xl md:text-5xl font-bold mb-6">Ready to Find Your Perfect Match?</h2>
+            <p className="text-lg md:text-xl mb-8 opacity-90 max-w-2xl mx-auto">
               Join thousands of happy users who found their ideal living situation through FindaRoomie
             </p>
             <motion.div
-              className="flex flex-col sm:flex-row gap-4 justify-center"
+              className="flex flex-col sm:flex-row gap-4 justify-center w-full sm:w-auto"
               initial={{ opacity: 0, scale: 0.8 }}
               whileInView={{ opacity: 1, scale: 1 }}
               transition={{ delay: 0.2, duration: 0.6 }}
               viewport={{ once: true }}
             >
-              <Link to="/register" className="btn btn-accent btn-lg text-white">
+              <Link to="/register" className="btn btn-accent btn-md md:btn-lg text-white w-full sm:w-auto">
                 Get Started Free
               </Link>
-              <Link to="/rooms" className="btn btn-outline btn-lg border-white text-white hover:bg-white hover:text-primary">
+              <Link to="/rooms" className="btn btn-outline btn-md md:btn-lg border-white text-white hover:bg-white hover:text-primary w-full sm:w-auto">
                 Browse Rooms
               </Link>
             </motion.div>
