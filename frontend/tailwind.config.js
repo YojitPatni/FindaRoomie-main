@@ -5,10 +5,14 @@ export default {
     './src/**/*.{js,jsx,ts,tsx}',
   ],
   theme: {
-    extend: {},
+    extend: {
+      fontFamily: {
+        sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+      },
+    },
   },
   plugins: [require('daisyui')],
   daisyui: {
-    themes: ["light", "dark", "cupcake"],
+    themes: ["light", "dark", "cupcake", "business", "corporate", "dracula", "synthwave"],
   },
 }

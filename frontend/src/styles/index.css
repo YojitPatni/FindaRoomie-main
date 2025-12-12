@@ -1,6 +1,26 @@
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-html, body, #root { height: 100%; }
-body { @apply bg-base-200 text-base-content; }
+html, body, #root { 
+  height: 100%; 
+  scroll-behavior: smooth;
+}
+
+body { 
+  @apply bg-base-200 text-base-content font-sans antialiased; 
+}
+
+/* Custom Scrollbar for Webkit */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  @apply bg-base-200;
+}
+::-webkit-scrollbar-thumb {
+  @apply bg-base-content/20 rounded-full hover:bg-base-content/30 transition-colors;
+}

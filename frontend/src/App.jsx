@@ -39,53 +39,90 @@ function Navbar() {
     }
   }, [user, initSocketSubscriptions, loadChats, loadMemberships]);
 
-  return (
-    <div className="navbar bg-base-100/80 backdrop-blur sticky top-0 z-40 border-b border-base-200">
-      <div className="flex-1">
-        <Link to="/" className="btn btn-ghost text-xl font-bold">FindaRoomie</Link>
-      </div>
-      <div className="flex-none gap-2 items-center">
-        <Link to="/rooms" className="btn btn-ghost"><Building2 className="w-4 h-4"/> Rooms</Link>
-        {user ? (
-          <>
-            <Link to="/my-rooms" className="btn btn-ghost">My Rooms</Link>
-            <Link to="/rooms/new" className="btn btn-ghost"><Plus className="w-4 h-4"/> New</Link>
-            <Link to="/requests/received" className="btn btn-ghost relative">
-              <Inbox className="w-4 h-4"/> Received
+  const navLinks = (
+    <>
+      <li>
+        <Link to="/rooms" className="flex items-center gap-2">
+          <Building2 className="w-4 h-4" /> Rooms
+        </Link>
+      </li>
+      {user && (
+        <>
+          <li><Link to="/my-rooms">My Rooms</Link></li>
+          <li><Link to="/rooms/new">Post a Room</Link></li>
+          <li>
+            <Link to="/requests/received" className="justify-between">
+              Requests
               {pendingRequestsCount > 0 && (
-                <span className="badge badge-error badge-sm absolute -top-2 -right-2 text-white">
-                  {pendingRequestsCount}
-                </span>
+                <span className="badge badge-error badge-sm text-white animate-pulse">{pendingRequestsCount}</span>
               )}
             </Link>
-            <Link to="/requests/sent" className="btn btn-ghost"><Send className="w-4 h-4"/> Sent</Link>
-            <Link to="/chat" className="btn btn-ghost relative">
-              <MessageCircle className="w-4 h-4"/> Chat
+          </li>
+          <li>
+            <Link to="/chat" className="justify-between">
+              Chat
               {unreadTotal > 0 && (
-                <span className="badge badge-primary badge-sm absolute -top-2 -right-2 text-white">
-                  {unreadTotal}
-                </span>
+                <span className="badge badge-primary badge-sm text-white">{unreadTotal}</span>
               )}
             </Link>
-            <div className="flex items-center gap-2 px-2">
-              <div className="avatar placeholder">
-                <div className="bg-primary text-primary-content rounded-full w-8 h-8 flex items-center justify-center">
-                  <span className="text-sm">{user?.name?.[0] || 'U'}</span>
-                </div>
-              </div>
-              <span className="text-sm font-medium max-w-[140px] truncate" title={user?.name}>{user?.name}</span>
-            </div>
-            <button className="btn btn-outline btn-sm" onClick={async () => { await logout(); navigate('/'); }}>
-              <LogOut className="w-4 h-4"/> Logout
-            </button>
-          </>
-        ) : (
-          <>
-            <Link to="/login" className="btn btn-outline btn-sm"><LogIn className="w-4 h-4"/> Login</Link>
-            <Link to="/register" className="btn btn-primary btn-sm text-white"><UserPlus className="w-4 h-4"/> Register</Link>
-          </>
-        )}
+          </li>
+        </>
+      )}
+    </>
+  );
+
+  return (
+    <div className="navbar bg-base-100/80 backdrop-blur-md border-b border-base-content/10 sticky top-0 z-50 transition-all duration-300">
+      <div className="navbar-start">
+        <div className="dropdown">
+          <div tabIndex={0} role="button" className="btn btn-ghost lg:hidden">
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h8m-8 6h16" /></svg>
+          </div>
+          <ul tabIndex={0} className="menu menu-sm dropdown-content mt-3 z-[1] p-2 shadow-lg bg-base-100 rounded-box w-52 border border-base-200">
+            {navLinks}
+          </ul>
+        </div>
+        <Link to="/" className="btn btn-ghost text-xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent hover:scale-105 transition-transform">
+          FindaRoomie
+        </Link>
+      </div>
+
+      <div className="navbar-center hidden lg:flex">
+        <ul className="menu menu-horizontal px-1 gap-1">
+          {navLinks}
+        </ul>
+      </div>
+
+      <div className="navbar-end gap-2">
         <ThemeToggle />
+        {user ? (
+          <div className="dropdown dropdown-end">
+            <div tabIndex={0} role="button" className="btn btn-ghost btn-circle avatar ring ring-primary ring-offset-base-100 ring-offset-2">
+              <div className="w-10 rounded-full bg-neutral text-neutral-content flex items-center justify-center">
+                {user.avatar && user.avatar.startsWith('http') ? (
+                  <img src={user.avatar} alt="avatar" />
+                ) : (
+                  <span className="text-xl font-bold">{user.name?.[0] || 'U'}</span>
+                )}
+              </div>
+            </div>
+            <ul tabIndex={0} className="menu menu-sm dropdown-content mt-3 z-[1] p-2 shadow-xl bg-base-100 rounded-box w-52 border border-base-200">
+              <li className="menu-title px-4 py-2">
+                <span className="text-xs opacity-50">Signed in as</span>
+                <span className="font-bold text-base">{user.name}</span>
+              </li>
+              <li><Link to="/profile" className="justify-between">Profile <span className="badge badge-ghost badge-sm">New</span></Link></li>
+              <li><Link to="/settings">Settings</Link></li>
+              <div className="divider my-1"></div>
+              <li><button onClick={async () => { await logout(); navigate('/'); }} className="text-error">Logout</button></li>
+            </ul>
+          </div>
+        ) : (
+          <div className="flex gap-2">
+            <Link to="/login" className="btn btn-ghost btn-sm">Login</Link>
+            <Link to="/register" className="btn btn-primary btn-sm shadow-md hover:shadow-lg transition-shadow">Register</Link>
+          </div>
+        )}
       </div>
     </div>
   );
