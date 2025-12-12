@@ -57,23 +57,23 @@ const createRequest = asyncHandler(async (req, res, next) => {
   try {
     if (request?.owner?.email) {
       const subject = `New room request for ${request?.room?.title || 'your room'}`;
-      const text = `Hello ${request.owner.name || ''},\n\n`+
-        `${request.requester.name || 'Someone'} has requested to rent your room "${request.room?.title || ''}".\n`+
-        `Message: ${request.message || '-'}\n`+
-        `Move-in date: ${request.moveInDate ? new Date(request.moveInDate).toDateString() : '-'}\n`+
-        `Lease duration: ${request.leaseDuration || '-'} months\n\n`+
+      const text = `Hello ${request.owner.name || ''},\n\n` +
+        `${request.requester.name || 'Someone'} has requested to rent your room "${request.room?.title || ''}".\n` +
+        `Message: ${request.message || '-'}\n` +
+        `Move-in date: ${request.moveInDate ? new Date(request.moveInDate).toDateString() : '-'}\n` +
+        `Lease duration: ${request.leaseDuration || '-'} months\n\n` +
         `Please log in to review and accept/reject the request.\n`;
-      const html = `<p>Hello ${request.owner.name || ''},</p>`+
-        `<p><strong>${request.requester.name || 'Someone'}</strong> has requested to rent your room <strong>${request.room?.title || ''}</strong>.</p>`+
-        `<ul>`+
-        `<li><b>Message:</b> ${request.message || '-'}</li>`+
-        `<li><b>Move-in date:</b> ${request.moveInDate ? new Date(request.moveInDate).toDateString() : '-'}</li>`+
-        `<li><b>Lease duration:</b> ${request.leaseDuration || '-'} months</li>`+
-        `</ul>`+
+      const html = `<p>Hello ${request.owner.name || ''},</p>` +
+        `<p><strong>${request.requester.name || 'Someone'}</strong> has requested to rent your room <strong>${request.room?.title || ''}</strong>.</p>` +
+        `<ul>` +
+        `<li><b>Message:</b> ${request.message || '-'}</li>` +
+        `<li><b>Move-in date:</b> ${request.moveInDate ? new Date(request.moveInDate).toDateString() : '-'}</li>` +
+        `<li><b>Lease duration:</b> ${request.leaseDuration || '-'} months</li>` +
+        `</ul>` +
         `<p>Please log in to review and accept/reject the request.</p>`;
       await sendMail({ to: request.owner.email, subject, text, html });
     }
-  } catch (_) {}
+  } catch (_) { }
 
   res.status(201).json({
     success: true,
@@ -112,8 +112,8 @@ const getRequest = asyncHandler(async (req, res, next) => {
     return next(new ErrorResponse('Request not found', 404));
   }
 
-  if (request.requester._id.toString() !== req.user.id && 
-      request.owner._id.toString() !== req.user.id) {
+  if (request.requester._id.toString() !== req.user.id &&
+    request.owner._id.toString() !== req.user.id) {
     return next(new ErrorResponse('Not authorized to view this request', 403));
   }
 
@@ -136,6 +136,14 @@ const acceptRequest = asyncHandler(async (req, res, next) => {
     return next(new ErrorResponse('Request not found', 404));
   }
 
+  // Check if room or requester still exists
+  if (!request.room) {
+    return next(new ErrorResponse('Associated room no longer exists', 404));
+  }
+  if (!request.requester) {
+    return next(new ErrorResponse('Requester account no longer exists', 404));
+  }
+
   if (request.owner.toString() !== req.user.id) {
     return next(new ErrorResponse('Not authorized to accept this request', 403));
   }
@@ -144,57 +152,87 @@ const acceptRequest = asyncHandler(async (req, res, next) => {
     return next(new ErrorResponse('Request is no longer pending', 400));
   }
 
+  // Update request status
   await request.accept(req.body.responseMessage);
 
-  let chat = await Chat.findOne({
-    room: request.room._id,
-    participants: { $all: [request.requester._id, request.owner] }
-  });
+  // Safe ID extraction
+  const requesterId = request.requester._id;
+  const ownerId = request.owner; // This is an ID because it wasn't populated
+  const roomId = request.room._id;
 
-  if (!chat) {
-    chat = await Chat.create({
-      participants: [request.requester._id, request.owner],
-      room: request.room._id
-    });
-  }
-
-  request.chat = chat._id;
-  await request.save();
-
-  const room = await Room.findById(request.room._id);
-  if (!room) {
-    return next(new ErrorResponse('Room not found', 404));
-  }
-  const capacity = room.capacity || 1;
-  const tenants = room.tenants || [];
-  const alreadyTenant = tenants.some(t => t.toString() === request.requester._id.toString());
-  if (alreadyTenant) {
-  } else if (tenants.length >= capacity) {
-    return next(new ErrorResponse('Room is already at full capacity', 400));
-  } else {
-    tenants.push(request.requester._id);
-  }
-  const status = tenants.length >= capacity ? 'occupied' : 'available';
-  room.tenants = tenants;
-  // keep legacy single tenant for backward compat (first tenant)
-  room.tenant = tenants[0] || null;
-  room.status = status;
-  await room.save();
-
+  // Create or Find Chat
+  let chat;
   try {
-    if (request?.requester?.email) {
-      const subject = `Your request for ${request?.room?.title || 'the room'} was accepted`;
-      const text = `Hello ${request.requester.name || ''},\n\n`+
-        `Good news! Your request for the room "${request.room?.title || ''}" has been accepted by the owner.\n`+
-        `${req.body?.responseMessage ? `Owner's message: ${req.body.responseMessage}\n` : ''}`+
+    chat = await Chat.findOne({
+      room: roomId,
+      participants: { $all: [requesterId, ownerId] }
+    });
+
+    if (!chat) {
+      chat = await Chat.create({
+        participants: [requesterId, ownerId],
+        room: roomId
+      });
+    }
+
+    request.chat = chat._id;
+    await request.save();
+  } catch (chatError) {
+    console.error('Chat creation failed:', chatError);
+    // Continue even if chat fails, or return error? 
+    // Usually better to continue for the "Accept" action but warn.
+  }
+
+  // Update Room Tenants
+  const roomDoc = await Room.findById(roomId);
+  if (roomDoc) {
+    const capacity = roomDoc.capacity || 1;
+    let tenants = roomDoc.tenants || [];
+
+    // Ensure tenants are ObjectIds
+    const isAlreadyTenant = tenants.some(t => t && t.toString() === requesterId.toString());
+
+    if (!isAlreadyTenant) {
+      if (tenants.length >= capacity) {
+        // Revert request acceptance? Or just warn?
+        // Ideally we shouldn't have accepted if full.
+        request.status = 'pending'; // Revert
+        await request.save();
+        return next(new ErrorResponse('Room is already at full capacity', 400));
+      }
+      tenants.push(requesterId);
+
+      const status = tenants.length >= capacity ? 'occupied' : 'available';
+      roomDoc.tenants = tenants;
+      roomDoc.tenant = tenants[0] || null; // Legacy
+      roomDoc.status = status;
+      await roomDoc.save();
+    }
+  }
+
+  // Send Email Notification
+  try {
+    if (request.requester.email) {
+      const subject = `Your request for ${request.room.title || 'the room'} was accepted`;
+      const text = `Hello ${request.requester.name || ''},\n\n` +
+        `Good news! Your request for the room "${request.room.title || ''}" has been accepted by the owner.\n` +
+        `${req.body?.responseMessage ? `Owner's message: ${req.body.responseMessage}\n` : ''}` +
         `You can now continue the conversation in chat and proceed with next steps.\n`;
-      const html = `<p>Hello ${request.requester.name || ''},</p>`+
-        `<p>Good news! Your request for the room <strong>${request.room?.title || ''}</strong> has been <span style="color:green;font-weight:bold;">accepted</span> by the owner.</p>`+
-        `${req.body?.responseMessage ? `<p><b>Owner's message:</b> ${req.body.responseMessage}</p>` : ''}`+
-        `<p>You can now continue the conversation in chat and proceed with next steps.</p>`;
+
+      const html = `<div style="font-family: sans-serif;">` +
+        `<h2>Request Accepted!</h2>` +
+        `<p>Hello ${request.requester.name || ''},</p>` +
+        `<p>Good news! Your request for the room <strong>${request.room.title || ''}</strong> has been <span style="color:green;font-weight:bold;">accepted</span> by the owner.</p>` +
+        `${req.body?.responseMessage ? `<p style="background:#f0f0f0;padding:10px;border-radius:5px;"><b>Owner's message:</b> ${req.body.responseMessage}</p>` : ''}` +
+        `<p>You can now continue the conversation in chat and proceed with next steps.</p>` +
+        `</div>`;
+
       await sendMail({ to: request.requester.email, subject, text, html });
     }
-  } catch (_) {}
+  } catch (mailError) {
+    console.error('Mail sending failed:', mailError);
+    // Don't fail the request if mail fails
+  }
 
   res.status(200).json({
     success: true,
@@ -228,17 +266,17 @@ const rejectRequest = asyncHandler(async (req, res, next) => {
       .populate('room', 'title');
     if (populated?.requester?.email) {
       const subject = `Your request for ${populated?.room?.title || 'the room'} was rejected`;
-      const text = `Hello ${populated.requester.name || ''},\n\n`+
-        `Unfortunately, your request for the room "${populated.room?.title || ''}" was rejected by the owner.\n`+
-        `${req.body?.responseMessage ? `Owner's message: ${req.body.responseMessage}\n` : ''}`+
+      const text = `Hello ${populated.requester.name || ''},\n\n` +
+        `Unfortunately, your request for the room "${populated.room?.title || ''}" was rejected by the owner.\n` +
+        `${req.body?.responseMessage ? `Owner's message: ${req.body.responseMessage}\n` : ''}` +
         `You can explore other rooms on the platform.\n`;
-      const html = `<p>Hello ${populated.requester.name || ''},</p>`+
-        `<p>Unfortunately, your request for the room <strong>${populated.room?.title || ''}</strong> has been <span style="color:#a00;font-weight:bold;">rejected</span> by the owner.</p>`+
-        `${req.body?.responseMessage ? `<p><b>Owner's message:</b> ${req.body.responseMessage}</p>` : ''}`+
+      const html = `<p>Hello ${populated.requester.name || ''},</p>` +
+        `<p>Unfortunately, your request for the room <strong>${populated.room?.title || ''}</strong> has been <span style="color:#a00;font-weight:bold;">rejected</span> by the owner.</p>` +
+        `${req.body?.responseMessage ? `<p><b>Owner's message:</b> ${req.body.responseMessage}</p>` : ''}` +
         `<p>You can explore other rooms on the platform.</p>`;
       await sendMail({ to: populated.requester.email, subject, text, html });
     }
-  } catch (_) {}
+  } catch (_) { }
 
   res.status(200).json({
     success: true,

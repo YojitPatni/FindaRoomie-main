@@ -38,9 +38,7 @@ export default function NewRoomPage() {
       if (form.capacity) fd.append('capacity', form.capacity);
       images.forEach((f) => fd.append('images', f));
 
-      const { data } = await api.post('/rooms', fd, {
-        headers: { 'Content-Type': 'multipart/form-data' }
-      });
+      const { data } = await api.post('/rooms', fd);
       navigate(`/rooms/${data.data._id}`);
     } catch (e) {
       window.alert(e.response?.data?.error || 'Failed to create room');

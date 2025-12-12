@@ -18,6 +18,7 @@ export default function RoomDetailPage() {
   const [roomMsgLoading, setRoomMsgLoading] = useState(false);
   const [roomInput, setRoomInput] = useState('');
   const [joinedRoomChat, setJoinedRoomChat] = useState(false);
+  const [imageErrors, setImageErrors] = useState({});
 
   useEffect(() => {
     const fetchRoom = async () => {
@@ -99,7 +100,11 @@ export default function RoomDetailPage() {
         <div className="carousel w-full h-72 bg-base-200 rounded-box">
           {(room.images?.length ? room.images : [{ url: 'https://placehold.co/800x400' }]).map((img, idx) => (
             <div key={idx} id={`slide${idx}`} className="carousel-item relative w-full">
-              <img src={img.url} className="w-full object-cover" />
+              <img
+                src={imageErrors[idx] ? 'https://placehold.co/800x400?text=Image+Not+Available' : img.url}
+                className="w-full object-cover"
+                onError={() => setImageErrors(prev => ({ ...prev, [idx]: true }))}
+              />
             </div>
           ))}
         </div>
@@ -119,7 +124,7 @@ export default function RoomDetailPage() {
           <div>{room.owner?.name}</div>
           <div className="text-sm opacity-80">{room.owner?.email}</div>
           {user && room.owner?._id !== user._id && (
-            <button className="btn btn-sm btn-outline mt-2" onClick={async ()=>{
+            <button className="btn btn-sm btn-outline mt-2" onClick={async () => {
               try {
                 await createOrGetChat(id, room.owner._id);
                 navigate('/chat');
@@ -173,7 +178,7 @@ export default function RoomDetailPage() {
             {!joinedRoomChat && <div className="text-sm opacity-70">Connecting to chat...</div>}
             <div className="border rounded-box p-3 h-64 overflow-auto bg-base-200/30 mb-2">
               {roomMsgLoading ? (
-                <div className="flex justify-center p-4"><span className="loading loading-spinner"/></div>
+                <div className="flex justify-center p-4"><span className="loading loading-spinner" /></div>
               ) : (
                 roomMsgs.map((m, idx) => (
                   <div key={idx} className="chat chat-start">
@@ -183,7 +188,7 @@ export default function RoomDetailPage() {
                 ))
               )}
             </div>
-            <form className="flex gap-2" onSubmit={(e)=>{
+            <form className="flex gap-2" onSubmit={(e) => {
               e.preventDefault();
               const text = roomInput.trim();
               if (!text) return;
@@ -197,7 +202,7 @@ export default function RoomDetailPage() {
                 }
               });
             }}>
-              <input className="input input-bordered flex-1" placeholder="Message everyone in this room" value={roomInput} onChange={(e)=>setRoomInput(e.target.value)} />
+              <input className="input input-bordered flex-1" placeholder="Message everyone in this room" value={roomInput} onChange={(e) => setRoomInput(e.target.value)} />
               <button className="btn btn-primary text-white" type="submit">Send</button>
             </form>
           </div>
